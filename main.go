@@ -2,18 +2,21 @@
 
 package main
 
-import (
-	"github.com/Robert-Safin/go-wasm/dom"
-)
+import "github.com/Robert-Safin/go-wasm/dom"
 
 func main() {
 
-	el := dom.CreateElement(dom.H1Tag)
-	el.SetProp(dom.InnerHTMLProp, "hello")
-	//fmt.Println(el.GetProp(typed.InnerHTMLProp))
+	btn1 := dom.CreateElement(dom.ButtonTag)
+	btn2 := dom.CreateElement(dom.ButtonTag)
 
-	el.Insert(dom.AppendChildMethod)
+	btn1.SetProp(dom.InnerHTMLProp, "one")
+	btn2.SetProp(dom.InnerHTMLProp, "two")
 
-	// Keep Go alive
+	btn1.Insert(dom.AppendChildMethod)
+
+	btn1.AddEvent(dom.ClickEvent, func() {
+		btn1.ReplaceWith(btn2)
+	})
+
 	select {}
 }

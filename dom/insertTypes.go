@@ -1,4 +1,4 @@
-package typed
+package dom
 
 type InsertionMethod string
 
