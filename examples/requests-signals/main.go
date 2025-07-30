@@ -25,15 +25,15 @@ func main() {
 
 	btn := dom.CreateElement(tag.Button)
 	btn.SetAttribute(attribute.InnerHTML, "next")
-	btn.Insert(insert.AppendChild)
+	btn.InsertIntoDom(insert.AppendChild)
 	p := dom.CreateElement(tag.P)
 	p.SetAttribute(attribute.InnerHTML, "Nothing")
-	p.Insert(insert.AppendChild)
+	p.InsertIntoDom(insert.AppendChild)
 
 	count := signal.NewSignal(0)
 	person := signal.NewSignal(Person{})
 
-	_ = btn.AddEvent(event.Click, func() {
+	_ = btn.AddEventListener(event.Click, func() {
 		go func() {
 			resp, _ := http.Get("https://swapi.info/api/people/" + strconv.Itoa(count.Get()))
 			var p Person
@@ -47,7 +47,7 @@ func main() {
 		p.SetAttribute(attribute.InnerHTML, person.Get().Name)
 	})
 
-	_ = p.AddEvent(event.Click, func() {
+	_ = p.AddEventListener(event.Click, func() {
 		btn.Delete()
 	})
 

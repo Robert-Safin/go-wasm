@@ -16,13 +16,13 @@ func main() {
 
 	btn := dom.CreateElement(tag.Button)
 	btn.SetAttribute(attribute.InnerHTML, "click me")
-	btn.Insert(insert.AppendChild)
+	btn.InsertIntoDom(insert.AppendChild)
 
 	p := dom.CreateElement(tag.P)
 	p.SetAttribute(attribute.InnerHTML, "0")
-	p.Insert(insert.AppendChild)
+	p.InsertIntoDom(insert.AppendChild)
 
-	btn.AddEvent(event.Click, func() {
+	btn.AddEventListener(event.Click, func() {
 		v, _ := p.GetAttribute(attribute.InnerHTML)
 		n, _ := strconv.Atoi(v.String())
 		_ = p.SetAttribute(attribute.InnerHTML, strconv.Itoa(n+1))

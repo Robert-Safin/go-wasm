@@ -62,10 +62,3 @@ func GetElementsByTagName(tag tag.TagName) ([]HtmlElement, bool) {
 // TODO
 // querySelector(selector)
 // querySelectorAll(selector)
-// SCOPED QUERIES
-// element.querySelector
-// element.querySelectorAll
-// element.getElementsByClassName
-// element.getElementsByTagName
-// NODE TRAVERSAL
-// parentNode, firstChild, lastChild, nextSibling, previousSibling, children
