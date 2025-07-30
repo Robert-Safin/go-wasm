@@ -35,7 +35,7 @@ func (s *Signal[T]) Get() T {
 func (s *Signal[T]) Set(v T) {
 	s.mu.Lock()
 	s.value = v
-	subs := append([]EffectFunc{}, s.subscribers...) // Copy to avoid mutation during loop
+	subs := append([]EffectFunc{}, s.subscribers...)
 	s.mu.Unlock()
 
 	for _, sub := range subs {

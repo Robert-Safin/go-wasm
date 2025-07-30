@@ -1,6 +1,6 @@
 //go:build js && wasm
 
-package examples
+package main
 
 import (
 	"encoding/json"
@@ -23,16 +23,17 @@ type Person struct {
 
 func main() {
 
-	btn := dom.CreateElement(tag.ButtonTag)
-	btn.SetAttribute(attribute.InnerHTMLAttribute, "next")
-	btn.Insert(insert.AppendChildMethod)
-	p := dom.CreateElement(tag.PTag)
-	p.Insert(insert.AppendChildMethod)
+	btn := dom.CreateElement(tag.Button)
+	btn.SetAttribute(attribute.InnerHTML, "next")
+	btn.Insert(insert.AppendChild)
+	p := dom.CreateElement(tag.P)
+	p.SetAttribute(attribute.InnerHTML, "Nothing")
+	p.Insert(insert.AppendChild)
 
 	count := signal.NewSignal(0)
 	person := signal.NewSignal(Person{})
 
-	_ = btn.AddEvent(event.ClickEvent, func() {
+	_ = btn.AddEvent(event.Click, func() {
 		go func() {
 			resp, _ := http.Get("https://swapi.info/api/people/" + strconv.Itoa(count.Get()))
 			var p Person
@@ -43,10 +44,10 @@ func main() {
 	})
 
 	signal.Effect(func() {
-		p.SetAttribute(attribute.InnerHTMLAttribute, person.Get().Name)
+		p.SetAttribute(attribute.InnerHTML, person.Get().Name)
 	})
 
-	_ = p.AddEvent(event.ClickEvent, func() {
+	_ = p.AddEvent(event.Click, func() {
 		btn.Delete()
 	})
 

@@ -1,6 +1,6 @@
 //go:build js && wasm
 
-package examples
+package main
 
 import (
 	"strconv"
@@ -9,7 +9,7 @@ import (
 	"github.com/Robert-Safin/go-wasm/signal"
 )
 
-func main2() {
+func main() {
 	doc := js.Global().Get("document")
 
 	// Create signal

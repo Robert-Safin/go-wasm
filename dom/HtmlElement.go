@@ -71,7 +71,7 @@ func (e HtmlElement) SetStyles(styles map[string]string) {
 	for k, v := range styles {
 		joined += k + ":" + v + ";"
 	}
-	e.SetAttribute(attribute.StyleAttribute, joined)
+	e.SetAttribute(attribute.Style, joined)
 }
 
 func (e HtmlElement) ReplaceWith(new HtmlElement) {
@@ -93,7 +93,7 @@ func (e HtmlElement) Children() {
 }
 
 func (e HtmlElement) AddClasses(classNames ...string) {
-	js, _ := e.GetAttribute(attribute.ClassNameAttribute)
+	js, _ := e.GetAttribute(attribute.ClassName)
 	classes := js.String()
 
 	if classes != "" {
@@ -108,7 +108,7 @@ func (e HtmlElement) AddClasses(classNames ...string) {
 		classes = classes[:len(classes)-1]
 
 	}
-	e.SetAttribute(attribute.ClassNameAttribute, classes)
+	e.SetAttribute(attribute.ClassName, classes)
 }
 
 func (e HtmlElement) RemoveClasses(classNames ...string) {
@@ -117,7 +117,7 @@ func (e HtmlElement) RemoveClasses(classNames ...string) {
 		toDelete[cls] = true
 	}
 
-	val, _ := e.GetAttribute(attribute.ClassNameAttribute)
+	val, _ := e.GetAttribute(attribute.ClassName)
 	existing := strings.Fields(val.String())
 
 	var kept []string
@@ -127,5 +127,5 @@ func (e HtmlElement) RemoveClasses(classNames ...string) {
 		}
 	}
 
-	e.SetAttribute(attribute.ClassNameAttribute, strings.Join(kept, " "))
+	e.SetAttribute(attribute.ClassName, strings.Join(kept, " "))
 }
