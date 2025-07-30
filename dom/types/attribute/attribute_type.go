@@ -1,4 +1,4 @@
-package dom
+package attribute
 
 type AttributeName string
 

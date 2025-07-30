@@ -4,6 +4,8 @@ package dom
 
 import (
 	"syscall/js"
+
+	"github.com/Robert-Safin/go-wasm/dom/types/tag"
 )
 
 func GetElementById(id string) (HtmlElement, bool) {
@@ -37,7 +39,7 @@ func GetElementsByClassName(class string) ([]HtmlElement, bool) {
 	return result, true
 }
 
-func GetElementsByTagName(tag TagName) ([]HtmlElement, bool) {
+func GetElementsByTagName(tag tag.TagName) ([]HtmlElement, bool) {
 	document := js.Global().Get("document")
 	elements := document.Call("getElementsByTagName", tag.String())
 

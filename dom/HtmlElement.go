@@ -4,14 +4,19 @@ package dom
 
 import (
 	"fmt"
+	"strings"
 	"syscall/js"
+
+	"github.com/Robert-Safin/go-wasm/dom/types/attribute"
+	"github.com/Robert-Safin/go-wasm/dom/types/event"
+	"github.com/Robert-Safin/go-wasm/dom/types/insert"
 )
 
 type HtmlElement struct {
 	Value js.Value
 }
 
-func (h HtmlElement) GetAttribute(prop AttributeName) (js.Value, bool) {
+func (h HtmlElement) GetAttribute(prop attribute.AttributeName) (js.Value, bool) {
 	v := h.Value.Get(string(prop))
 	if v.IsUndefined() {
 		var zero js.Value
@@ -20,7 +25,7 @@ func (h HtmlElement) GetAttribute(prop AttributeName) (js.Value, bool) {
 	return v, true
 }
 
-func (h HtmlElement) SetAttribute(prop AttributeName, value string) bool {
+func (h HtmlElement) SetAttribute(prop attribute.AttributeName, value string) bool {
 	ok := true
 	defer func() {
 		if r := recover(); r != nil {
@@ -32,7 +37,7 @@ func (h HtmlElement) SetAttribute(prop AttributeName, value string) bool {
 	return ok
 }
 
-func (h HtmlElement) SetAttributeMap(props map[AttributeName]string) bool {
+func (h HtmlElement) SetAttributeMap(props map[attribute.AttributeName]string) bool {
 	for k, v := range props {
 		ok := h.SetAttribute(k, v)
 		if !ok {
@@ -42,13 +47,13 @@ func (h HtmlElement) SetAttributeMap(props map[AttributeName]string) bool {
 	return true
 }
 
-func (h HtmlElement) Insert(method InsertionMethod) bool {
+func (h HtmlElement) Insert(method insert.InsertionMethod) bool {
 	document := js.Global().Get("document")
 	document.Get("body").Call(method.String(), h.Value)
 	return true
 }
 
-func (e HtmlElement) AddEvent(eventType EventType, f func()) (cleanup func()) {
+func (e HtmlElement) AddEvent(eventType event.EventType, f func()) (cleanup func()) {
 	handler := js.FuncOf(func(this js.Value, args []js.Value) any {
 		f()
 		return nil
@@ -66,13 +71,61 @@ func (e HtmlElement) SetStyles(styles map[string]string) {
 	for k, v := range styles {
 		joined += k + ":" + v + ";"
 	}
-	e.SetAttribute(StyleAttribute, joined)
+	e.SetAttribute(attribute.StyleAttribute, joined)
 }
 
 func (e HtmlElement) ReplaceWith(new HtmlElement) {
 	e.Value.Call("replaceWith", new.Value)
 }
 
-func (e HtmlElement) Children(new HtmlElement) {
+func (e HtmlElement) Children() {
+	children := e.Value.Get("children")
+	length := children.Get("length").Int()
 
+	result := make([]HtmlElement, 0, length)
+
+	for i := range length {
+		child := children.Index(i)
+		result = append(result, HtmlElement{child})
+	}
+	fmt.Println(result)
+
+}
+
+func (e HtmlElement) AddClasses(classNames ...string) {
+	js, _ := e.GetAttribute(attribute.ClassNameAttribute)
+	classes := js.String()
+
+	if classes != "" {
+		classes += " "
+	}
+
+	for _, c := range classNames {
+		classes += c + " "
+	}
+
+	if classes != "" {
+		classes = classes[:len(classes)-1]
+
+	}
+	e.SetAttribute(attribute.ClassNameAttribute, classes)
+}
+
+func (e HtmlElement) RemoveClasses(classNames ...string) {
+	toDelete := make(map[string]bool, len(classNames))
+	for _, cls := range classNames {
+		toDelete[cls] = true
+	}
+
+	val, _ := e.GetAttribute(attribute.ClassNameAttribute)
+	existing := strings.Fields(val.String())
+
+	var kept []string
+	for _, cls := range existing {
+		if !toDelete[cls] {
+			kept = append(kept, cls)
+		}
+	}
+
+	e.SetAttribute(attribute.ClassNameAttribute, strings.Join(kept, " "))
 }

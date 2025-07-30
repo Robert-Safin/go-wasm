@@ -1,4 +1,4 @@
-package dom
+package event
 
 type EventType string
 

@@ -6,22 +6,26 @@ import (
 	"strconv"
 
 	"github.com/Robert-Safin/go-wasm/dom"
+	"github.com/Robert-Safin/go-wasm/dom/types/attribute"
+	"github.com/Robert-Safin/go-wasm/dom/types/event"
+	"github.com/Robert-Safin/go-wasm/dom/types/insert"
+	"github.com/Robert-Safin/go-wasm/dom/types/tag"
 )
 
 func main1() {
 
-	btn := dom.CreateElement(dom.ButtonTag)
-	btn.SetAttribute(dom.InnerHTMLAttribute, "click me")
-	btn.Insert(dom.AppendChildMethod)
+	btn := dom.CreateElement(tag.ButtonTag)
+	btn.SetAttribute(attribute.InnerHTMLAttribute, "click me")
+	btn.Insert(insert.AppendChildMethod)
 
-	p := dom.CreateElement(dom.PTag)
-	p.SetAttribute(dom.InnerHTMLAttribute, "0")
-	p.Insert(dom.AppendChildMethod)
+	p := dom.CreateElement(tag.PTag)
+	p.SetAttribute(attribute.InnerHTMLAttribute, "0")
+	p.Insert(insert.AppendChildMethod)
 
-	btn.AddEvent(dom.ClickEvent, func() {
-		v, _ := p.GetAttribute(dom.InnerHTMLAttribute)
+	btn.AddEvent(event.ClickEvent, func() {
+		v, _ := p.GetAttribute(attribute.InnerHTMLAttribute)
 		n, _ := strconv.Atoi(v.String())
-		_ = p.SetAttribute(dom.InnerHTMLAttribute, strconv.Itoa(n+1))
+		_ = p.SetAttribute(attribute.InnerHTMLAttribute, strconv.Itoa(n+1))
 	})
 
 	// Keep Go alive
