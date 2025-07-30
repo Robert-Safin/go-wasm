@@ -13,3 +13,7 @@ const (
 	BeforeMethod       InsertionMethod = "before"
 	ReplaceWithMethod  InsertionMethod = "replaceWith"
 )
+
+func (p InsertionMethod) String() string {
+	return string(p)
+}
