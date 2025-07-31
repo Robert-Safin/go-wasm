@@ -32,13 +32,13 @@ func (h HtmlElement) GetAttribute(prop attribute.AttributeName) (string, bool) {
 }
 
 // Sets attribute value.
-func (h HtmlElement) SetAttribute(prop attribute.AttributeName, value string) {
-	h.Value.Set(prop.String(), value)
+func (h HtmlElement) SetAttribute(attribute attribute.AttributeName, value string) {
+	h.Value.Set(attribute.String(), value)
 }
 
 // Sets multiple attribute values. (loops and calls SetAttribute)
-func (h HtmlElement) SetAttributeMap(props map[attribute.AttributeName]string) {
-	for k, v := range props {
+func (h HtmlElement) SetAttributeMap(attributes map[attribute.AttributeName]string) {
+	for k, v := range attributes {
 		h.SetAttribute(k, v)
 	}
 }
