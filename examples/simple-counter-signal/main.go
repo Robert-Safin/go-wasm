@@ -23,7 +23,7 @@ func main() {
 
 	p := dom.CreateElement(tag.P)
 
-	count, _ := signal.NewSignal(0, func(a int, b int) bool {
+	count, cleanup := signal.NewSignal(0, func(a int, b int) bool {
 		return a == b
 	})
 
@@ -32,7 +32,7 @@ func main() {
 		attribute.InnerHTML: strconv.Itoa(count.Get()),
 	})
 
-	count.Effect(func() {
+	_ = count.Effect(func() {
 		p.SetAttribute(attribute.InnerHTML, strconv.Itoa(count.Get()))
 	})
 
@@ -45,6 +45,9 @@ func main() {
 
 	btn.AddEventListener(event.Click, func() {
 		count.Set(count.Get() + 1)
+		if count.Get() == 10 {
+			cleanup()
+		}
 	})
 
 	select {}
