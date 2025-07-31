@@ -3,14 +3,12 @@
 package signal
 
 import (
-	"sync"
 	"syscall/js"
 )
 
 type EffectFunc func()
 
 type Signal[T any] struct {
-	mu          sync.Mutex
 	value       T
 	subscribers []EffectFunc
 }
@@ -23,9 +21,6 @@ func NewSignal[T any](initial T) *Signal[T] {
 }
 
 func (s *Signal[T]) Get() T {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	if currentEffect != nil {
 		s.subscribers = append(s.subscribers, currentEffect)
 	}
@@ -33,10 +28,8 @@ func (s *Signal[T]) Get() T {
 }
 
 func (s *Signal[T]) Set(v T) {
-	s.mu.Lock()
 	s.value = v
 	subs := append([]EffectFunc{}, s.subscribers...)
-	s.mu.Unlock()
 
 	for _, sub := range subs {
 		sub()
