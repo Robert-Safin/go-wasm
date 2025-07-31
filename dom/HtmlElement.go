@@ -57,7 +57,7 @@ func (h HtmlElement) SetAttributeMap(props map[attribute.AttributeName]string) b
 	return true
 }
 
-// STYLING
+// STYLING ATTRIBUTE
 func (e HtmlElement) SetStyles(styles map[string]string) {
 	joined := ""
 	for k, v := range styles {
@@ -106,41 +106,30 @@ func (e HtmlElement) RemoveStyles(styles ...string) {
 
 	e.SetStyles(updatedStyles)
 }
+
+// CLASSES
 func (e HtmlElement) AddClasses(classNames ...string) {
-	js, _ := e.GetAttribute(attribute.ClassName)
-	classes := js.String()
-
-	if classes != "" {
-		classes += " "
+	js := e.Value.Get("classList")
+	for _, v := range classNames {
+		js.Call("add", v)
 	}
-
-	for _, c := range classNames {
-		classes += c + " "
-	}
-
-	if classes != "" {
-		classes = classes[:len(classes)-1]
-
-	}
-	e.SetAttribute(attribute.ClassName, classes)
 }
 func (e HtmlElement) RemoveClasses(classNames ...string) {
-	toDelete := make(map[string]bool, len(classNames))
-	for _, cls := range classNames {
-		toDelete[cls] = true
+	js := e.Value.Get("classList")
+	for _, v := range classNames {
+		js.Call("remove", v)
 	}
-
-	val, _ := e.GetAttribute(attribute.ClassName)
-	existing := strings.Fields(val.String())
-
-	var kept []string
-	for _, cls := range existing {
-		if !toDelete[cls] {
-			kept = append(kept, cls)
-		}
+}
+func (e HtmlElement) ContainsClass(className string) bool {
+	js := e.Value.Get("classList")
+	js = js.Call("contains", className)
+	return js.Bool()
+}
+func (e HtmlElement) ToggleClasses(classNames ...string) {
+	js := e.Value.Get("classList")
+	for _, className := range classNames {
+		js = js.Call("toggle", className)
 	}
-
-	e.SetAttribute(attribute.ClassName, strings.Join(kept, " "))
 }
 
 // MISC
