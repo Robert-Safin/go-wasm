@@ -24,8 +24,8 @@ func main() {
 
 	btn.AddEventListener(event.Click, func() {
 		v, _ := p.GetAttribute(attribute.InnerHTML)
-		n, _ := strconv.Atoi(v.String())
-		_ = p.SetAttribute(attribute.InnerHTML, strconv.Itoa(n+1))
+		n, _ := strconv.Atoi(v)
+		p.SetAttribute(attribute.InnerHTML, strconv.Itoa(n+1))
 	})
 
 	// Keep Go alive

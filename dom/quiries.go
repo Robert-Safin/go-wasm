@@ -3,62 +3,55 @@
 package dom
 
 import (
-	"syscall/js"
-
 	"github.com/Robert-Safin/go-wasm/dom/types/tag"
 )
 
-func GetElementById(id string) (HtmlElement, bool) {
-	document := js.Global().Get("document")
-	element := document.Call("getElementById", id)
-
-	if element.IsUndefined() || element.IsNull() {
+// Returns element with provided id if any. Scoped to the document.
+func GetElementById(target HtmlElement, id string) (HtmlElement, bool) {
+	element := target.Value.Call("getElementById", id)
+	if !element.Truthy() {
 		var zero HtmlElement
 		return zero, false
 	}
 	return HtmlElement{element}, true
 }
 
-func GetElementsByClassName(class string) ([]HtmlElement, bool) {
-	document := js.Global().Get("document")
-	elements := document.Call("getElementsByClassName", class)
-
-	length := elements.Get("length").Int()
-
-	if length == 0 {
-		return nil, false
+// Returns elements with provided class if any. Scoped to the document.
+func GetElementsByClassName(target HtmlElement, className string) []HtmlElement {
+	elements := target.Value.Call("getElementsByClassName", className)
+	res := []HtmlElement{}
+	for i := range elements.Length() {
+		res = append(res, HtmlElement{elements.Index(i)})
 	}
-
-	result := make([]HtmlElement, 0, length)
-
-	for i := range length {
-		element := elements.Index(i)
-		result = append(result, HtmlElement{element})
-	}
-
-	return result, true
+	return res
 }
 
-func GetElementsByTagName(tag tag.TagName) ([]HtmlElement, bool) {
-	document := js.Global().Get("document")
-	elements := document.Call("getElementsByTagName", tag.String())
-
-	length := elements.Get("length").Int()
-
-	if length == 0 {
-		return nil, false
+// Returns elements with provided tag if any
+func GetElementsByTagName(target HtmlElement, tag tag.TagName) []HtmlElement {
+	elements := target.Value.Call("getElementsByTagName", tag.String())
+	res := []HtmlElement{}
+	for i := range elements.Length() {
+		res = append(res, HtmlElement{elements.Index(i)})
 	}
-
-	result := make([]HtmlElement, 0, length)
-
-	for i := range length {
-		element := elements.Index(i)
-		result = append(result, HtmlElement{element})
-	}
-
-	return result, true
+	return res
 }
 
-// TODO
-// querySelector(selector)
-// querySelectorAll(selector)
+// Returns first element found by CSS selector if any. Scoped to any descendant of the target element.
+func QuerySelector(target HtmlElement, selector string) (HtmlElement, bool) {
+	element := target.Value.Call("querySelector", selector)
+	if !element.Truthy() {
+		var zero HtmlElement
+		return zero, false
+	}
+	return HtmlElement{element}, true
+}
+
+// Returns all elements found by CSS selector if any. Scoped to any descendant of the target element.
+func QuerySelectorAll(target HtmlElement, selector string) []HtmlElement {
+	elements := target.Value.Call("querySelectorAll", selector)
+	res := []HtmlElement{}
+	for i := range elements.Length() {
+		res = append(res, HtmlElement{elements.Index(i)})
+	}
+	return res
+}

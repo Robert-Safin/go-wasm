@@ -32,6 +32,9 @@ const (
 	Script   TagName = "script"
 	Link     TagName = "link"
 	Style    TagName = "style"
+	Body     TagName = "body"
+	Head     TagName = "head"
+	HTML     TagName = "html"
 )
 
 func (t TagName) String() string {

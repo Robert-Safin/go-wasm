@@ -3,7 +3,6 @@
 package dom
 
 import (
-	"fmt"
 	"strings"
 	"syscall/js"
 
@@ -19,45 +18,34 @@ type HtmlElement struct {
 	Value js.Value
 }
 
-// SHORTCUTS FROM DOM PACKAGE
-func (h HtmlElement) InsertIntoDom(method insert.InsertionMethod) bool {
-	return InsertIntoDom(h, method)
-}
-func (e HtmlElement) AddEventListener(eventType event.EventType, f func()) (cleanup func()) {
-	return AddEventListener(e, eventType, f)
-}
-
 // GETTERS AND SETTER
-func (h HtmlElement) GetAttribute(prop attribute.AttributeName) (js.Value, bool) {
+
+// Retuns string behind given attribute. Will return a false if attribute is not set.
+// Note: browsers can and will accept objects as attribute values, by calling .toString() and returning that.
+func (h HtmlElement) GetAttribute(prop attribute.AttributeName) (string, bool) {
 	v := h.Value.Get(string(prop))
 	if !v.Truthy() {
-		var zero js.Value
+		var zero string
 		return zero, false
 	}
-	return v, true
+	return v.String(), true
 }
-func (h HtmlElement) SetAttribute(prop attribute.AttributeName, value string) bool {
-	ok := true
-	defer func() {
-		if r := recover(); r != nil {
-			ok = false
-			fmt.Println("Recovered from panic during property setting:", r)
-		}
-	}()
+
+// Sets attribute value.
+func (h HtmlElement) SetAttribute(prop attribute.AttributeName, value string) {
 	h.Value.Set(prop.String(), value)
-	return ok
 }
-func (h HtmlElement) SetAttributeMap(props map[attribute.AttributeName]string) bool {
+
+// Sets multiple attribute values. (loops and calls SetAttribute)
+func (h HtmlElement) SetAttributeMap(props map[attribute.AttributeName]string) {
 	for k, v := range props {
-		ok := h.SetAttribute(k, v)
-		if !ok {
-			return false
-		}
+		h.SetAttribute(k, v)
 	}
-	return true
 }
 
 // STYLING ATTRIBUTE
+
+// Sets value of the style attribute. Accepts a map of property:value.
 func (e HtmlElement) SetStyles(styles map[string]string) {
 	joined := ""
 	for k, v := range styles {
@@ -65,6 +53,10 @@ func (e HtmlElement) SetStyles(styles map[string]string) {
 	}
 	e.SetAttribute(attribute.Style, joined)
 }
+
+// Overlays and sets new styles on top of existing styles inside style attribute.
+// If a property already existed, its value will be updated.
+// If a property did not exist, it will be set.
 func (e HtmlElement) UpdateStyles(newStyles map[string]string) {
 	v := e.Value.Call("getAttribute", "style")
 	existingStyles := v.String()
@@ -86,6 +78,8 @@ func (e HtmlElement) UpdateStyles(newStyles map[string]string) {
 
 	e.SetStyles(updatedStyles)
 }
+
+// Accepts properties, removes those properties and their values from style attribute.
 func (e HtmlElement) RemoveStyles(styles ...string) {
 	v := e.Value.Call("getAttribute", "style")
 	existingStyles := v.String()
@@ -108,23 +102,31 @@ func (e HtmlElement) RemoveStyles(styles ...string) {
 }
 
 // CLASSES
+
+// Adds classes to class attribute.
 func (e HtmlElement) AddClasses(classNames ...string) {
 	js := e.Value.Get("classList")
 	for _, v := range classNames {
 		js.Call("add", v)
 	}
 }
+
+// Remove classes from class attribute.
 func (e HtmlElement) RemoveClasses(classNames ...string) {
 	js := e.Value.Get("classList")
 	for _, v := range classNames {
 		js.Call("remove", v)
 	}
 }
+
+// Check if class exists.
 func (e HtmlElement) ContainsClass(className string) bool {
 	js := e.Value.Get("classList")
 	js = js.Call("contains", className)
 	return js.Bool()
 }
+
+// Removes a class if it exists. If it does not exist, it is added.
 func (e HtmlElement) ToggleClasses(classNames ...string) {
 	js := e.Value.Get("classList")
 	for _, className := range classNames {
@@ -133,28 +135,43 @@ func (e HtmlElement) ToggleClasses(classNames ...string) {
 }
 
 // MISC
+
+// Deletes element from DOM.
 func (e HtmlElement) Delete() {
 	e.Value.Call("remove")
 }
 
 // INSERTING
+
+// Appends new child element as the last child of the target.
 func (e HtmlElement) AppendChild(child HtmlElement) {
 	e.Value.Call("append", child.Value)
 }
+
+// Appends new child element as the first child of the target.
 func (e HtmlElement) PrependChild(child HtmlElement) {
 	e.Value.Call("prepend", child.Value)
 }
-func (e HtmlElement) InsertBefore(child HtmlElement) {
-	e.Value.Call("before", child.Value)
+
+// Inserts sibling element before target element.
+func (e HtmlElement) InsertBefore(sibling HtmlElement) {
+	e.Value.Call("before", sibling.Value)
 }
-func (e HtmlElement) InsertAfter(child HtmlElement) {
-	e.Value.Call("after", child.Value)
+
+// Inserts sibling element after target element.
+func (e HtmlElement) InsertAfter(sibling HtmlElement) {
+	e.Value.Call("after", sibling.Value)
 }
+
+// Replaces target element with another.
 func (e HtmlElement) ReplaceWith(new HtmlElement) {
 	e.Value.Call("replaceWith", new.Value)
 }
 
 // TRAVERSAL
+
+// Returns parent element of the target element.
+// Returns false if element is not attached to the DOM or if called on the document.
 func (e HtmlElement) Parent() (HtmlElement, bool) {
 	v := e.Value.Get("parentElement")
 	if !v.Truthy() {
@@ -163,6 +180,8 @@ func (e HtmlElement) Parent() (HtmlElement, bool) {
 	}
 	return HtmlElement{v}, true
 }
+
+// Returns slice of children of the target element. Returns empty slice if there are not children.
 func (e HtmlElement) Children() []HtmlElement {
 	children := e.Value.Get("children")
 	length := children.Get("length").Int()
@@ -175,6 +194,8 @@ func (e HtmlElement) Children() []HtmlElement {
 	}
 	return result
 }
+
+// Returns first child if any.
 func (e HtmlElement) FirstChild() (HtmlElement, bool) {
 	c := e.Children()
 	if len(c) == 0 {
@@ -184,6 +205,8 @@ func (e HtmlElement) FirstChild() (HtmlElement, bool) {
 
 	return c[0], true
 }
+
+// Returns last child if any.
 func (e HtmlElement) LastChild() (HtmlElement, bool) {
 	c := e.Children()
 	if len(c) == 0 {
@@ -193,10 +216,14 @@ func (e HtmlElement) LastChild() (HtmlElement, bool) {
 
 	return c[len(c)-1], true
 }
+
+// Returns count of children.
 func (e HtmlElement) ChildElementCount() int {
 	c := e.Children()
 	return len(c)
 }
+
+// Returns next ('below') sibling.
 func (e HtmlElement) NextElementSibling() (HtmlElement, bool) {
 	c := e.Value.Get("nextElementSibling")
 	if !c.Truthy() {
@@ -205,6 +232,8 @@ func (e HtmlElement) NextElementSibling() (HtmlElement, bool) {
 	}
 	return HtmlElement{c}, true
 }
+
+// Returns previous ('above') sibling.
 func (e HtmlElement) PreviousElementSibling() (HtmlElement, bool) {
 	c := e.Value.Get("previousElementSibling")
 	if !c.Truthy() {
@@ -214,36 +243,39 @@ func (e HtmlElement) PreviousElementSibling() (HtmlElement, bool) {
 	return HtmlElement{c}, true
 }
 
-// SCOPED QUERIES
+// SHORTCUTS FROM DOM
+// Returns element with provided id if any. Scoped to the document.
+func (e HtmlElement) GetElementById(id string) (HtmlElement, bool) {
+	return GetElementById(e, id)
+}
+
+// Returns first element found by CSS selector if any. Scoped to any descendant of the target element.
 func (e HtmlElement) QuerySelector(selector string) (HtmlElement, bool) {
-	element := e.Value.Call("querySelector", selector)
-	if !element.Truthy() {
-		var zero HtmlElement
-		return zero, false
-	}
-	return HtmlElement{element}, true
+	return QuerySelector(e, selector)
 }
+
+// Returns all elements found by CSS selector if any. Scoped to any descendant of the target element.
 func (e HtmlElement) QuerySelectorAll(selector string) []HtmlElement {
-	elements := e.Value.Call("querySelectorAll", selector)
-	res := []HtmlElement{}
-	for i := range elements.Length() {
-		res = append(res, HtmlElement{elements.Index(i)})
-	}
-	return res
+	return QuerySelectorAll(e, selector)
 }
+
+// Returns all elements with the provided class if any. Scoped to any descendant of the target element.
 func (e HtmlElement) GetElementsByClassName(className string) []HtmlElement {
-	elements := e.Value.Call("getElementsByClassName", className)
-	res := []HtmlElement{}
-	for i := range elements.Length() {
-		res = append(res, HtmlElement{elements.Index(i)})
-	}
-	return res
+	return GetElementsByClassName(e, className)
 }
+
+// Returns all elements of the provided tag if any. Scoped to any descendant of the target element.
 func (e HtmlElement) GetElementsByTagName(tag tag.TagName) []HtmlElement {
-	elements := e.Value.Call("getElementsByTagName", tag.String())
-	res := []HtmlElement{}
-	for i := range elements.Length() {
-		res = append(res, HtmlElement{elements.Index(i)})
-	}
-	return res
+	return GetElementsByTagName(e, tag)
+}
+
+// Inserts HTML element with specified insertion type relative to the HTML body tag.
+func (h HtmlElement) InsertIntoDom(method insert.InsertionMethod) {
+	InsertIntoDom(h, method)
+}
+
+// Attaches event listener to target element with specified event type.
+// Ececutes provided callback. Returns a clean-up function used to remove the event listener.
+func (e HtmlElement) AddEventListener(eventType event.EventType, f func()) (cleanup func()) {
+	return AddEventListener(e, eventType, f)
 }
