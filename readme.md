@@ -3,6 +3,7 @@
 - Instinctive signal based reactivity system (40 lines).
 - Resolver for Promises.
 - Full support for fetch API, as well as some other minor ones.
+- No dependencies. Built with std's "syscall/js".
 
 # Why?
 - Simple, declarative and idiomatic Go.
