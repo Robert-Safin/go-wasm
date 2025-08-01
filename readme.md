@@ -148,6 +148,6 @@ func main() {
 ##### Compile
 `GOOS=js GOARCH=wasm go build -o main.wasm ./main.go`
 ##### 'Glue'
-Load compiled wasm binary in skeleton .html as seen in `index.html` and also include `wasm_exec.js`.
+Load compiled wasm binary inside skeleton html as seen in `index.html` and also include `wasm_exec.js`.
 ##### Spin up static fileserver
 `serve .`
