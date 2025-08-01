@@ -22,32 +22,24 @@ func main() {
 	div.AppendChild(btn)
 
 	p := dom.CreateElement(tag.P)
-
-	count, cleanup := signal.NewSignal(0, func(a int, b int) bool {
-		return a == b
-	})
-
-	p.SetAttributeMap(map[attribute.AttributeName]string{
-		attribute.ID:        "count",
-		attribute.InnerHTML: strconv.Itoa(count.Get()),
-	})
-
-	_ = count.Effect(func() {
-		p.SetAttribute(attribute.InnerHTML, strconv.Itoa(count.Get()))
-	})
-
 	p.SetStyles(map[string]string{
 		"font-size": "40px",
 		"color":     "red",
 	})
-
 	div.InsertAfter(p)
+
+	count, _ := signal.NewSignal(0, func(a int, b int) bool {
+		return a == b
+	})
+
+	p.SetAttribute(attribute.InnerHTML, strconv.Itoa(count.Get()))
+
+	count.Effect(func() {
+		p.SetAttribute(attribute.InnerHTML, strconv.Itoa(count.Get()))
+	})
 
 	btn.AddEventListener(event.Click, func() {
 		count.Set(count.Get() + 1)
-		if count.Get() == 10 {
-			cleanup()
-		}
 	})
 
 	select {}
