@@ -25,9 +25,7 @@
 	})
 	div.InsertAfter(p)
 
-	count, _ := signal.NewSignal(0, func(a int, b int) bool {
-		return a == b
-	})
+	count, _ := signal.NewSignal(0, nil)
 
 	p.SetAttribute(attribute.InnerHTML, strconv.Itoa(count.Get()))
 
