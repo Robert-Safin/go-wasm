@@ -4,6 +4,7 @@ package location
 
 import "syscall/js"
 
+// Navigate to new URL, preserves history.
 func Navigate(url string) {
 	js.Global().Get("window").Get("location").Set("href", url)
 }

@@ -4,6 +4,7 @@ package error
 
 import "syscall/js"
 
+// Wrapper for implementation
 type Error struct {
 	Value js.Value
 }

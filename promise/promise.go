@@ -8,6 +8,7 @@ import (
 	"github.com/Robert-Safin/go-wasm/error"
 )
 
+// Wrapper for implementation
 type Promise struct {
 	Value js.Value
 }

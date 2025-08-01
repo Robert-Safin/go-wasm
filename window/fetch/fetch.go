@@ -9,6 +9,9 @@ import (
 	"github.com/Robert-Safin/go-wasm/promise"
 )
 
+// Return []byte if successful.
+// Will call onSuccess([]byte) callback will all well.
+// Otherwise calls onError(error.Error). error.Error is wrapped around JS Error object.
 func Fetch(
 	method string,
 	url string,
@@ -40,10 +43,14 @@ func Fetch(
 					length := uint8Array.Get("length").Int()
 					data := make([]byte, length)
 					js.CopyBytesToGo(data, uint8Array)
-					onSuccess(data)
+					if onSuccess != nil {
+						onSuccess(data)
+					}
 				},
 				func(errMsg error.Error) {
-					onError(errMsg)
+					if onError != nil {
+						onError(errMsg)
+					}
 				},
 			)
 		},

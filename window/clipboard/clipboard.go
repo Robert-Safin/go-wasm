@@ -10,6 +10,7 @@ import (
 )
 
 // Copies value to clipboard
+// Use callabacks to detect failure/success
 func Copy(value string, onSuccess func(js.Value), onError func(error.Error)) {
 	p := promise.IntoPromise(js.Global().Get("navigator").Get("clipboard").Call("writeText", js.ValueOf(value)))
 	p.Resolve(

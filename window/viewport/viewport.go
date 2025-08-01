@@ -4,18 +4,12 @@ package viewport
 
 import "syscall/js"
 
-type Viewport struct {
-	Value js.Value
+// Viewport width
+func InnerWidth() int {
+	return js.Global().Get("window").Get("innerWidth").Int()
 }
 
-func Init() *Viewport {
-	v := js.Global().Get("window")
-	return &Viewport{v}
-}
-func (v *Viewport) InnerWidth() int {
-	return v.Value.Get("innerWidth").Int()
-
-}
-func (v *Viewport) InnerHeight() int {
-	return v.Value.Get("innerHeight").Int()
+// Viewport height
+func InnerHeight() int {
+	return js.Global().Get("window").Get("innerHeight").Int()
 }
