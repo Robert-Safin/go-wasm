@@ -1,6 +1,6 @@
 //go:build js && wasm
 
-package localstorage
+package localStroage
 
 import "syscall/js"
 

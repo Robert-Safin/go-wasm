@@ -1,5 +1,6 @@
 //go:build js && wasm
 
+// [EXPERIMENTAL]
 package react
 
 type State[T any] struct {
