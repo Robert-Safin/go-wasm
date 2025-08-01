@@ -9,7 +9,7 @@ import (
 	"github.com/Robert-Safin/go-wasm/promise"
 )
 
-// Return []byte if successful.
+// Always returns []byte.
 // Will call onSuccess([]byte) callback will all well.
 // Otherwise calls onError(error.Error). error.Error is wrapped around JS Error object.
 func Fetch(
