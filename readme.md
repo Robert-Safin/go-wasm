@@ -4,7 +4,12 @@
 - Resolver for Promises.
 - Full support for fetch API, as well as some other minor ones.
 
-# Simple example
+# Why?
+- Simple, declarative and idiomatic Go.
+- Add client-side interactivity without touching HTML, CSS or JavaScript, all in Go.
+- Pre-compile wasm binaries, and serve them from any existing HTML serving backend.
+
+# Primitives
 ```go
 	div := dom.CreateElement(tag.Div)
 	dom.InsertIntoDom(div, insert.AppendChild)
@@ -33,7 +38,7 @@
 	btn.AddEventListener(event.Click, func() {
 		count.Set(count.Get() + 1)
 	})
-	```
+```
 
 # Another example in detail
 Compiled binary 3.2mb
